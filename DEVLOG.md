@@ -106,3 +106,25 @@ Plan for tomorrow:
 - Create the public shareable audit URL (`/audit/[id]`).
 - Implement the Anthropic/OpenAI summary generation using `api/summary` or directly in the audit API.
 - Set up Open Graph tags for shareability.
+
+## Day 6 — 2026-05-10
+
+Hours worked: 2
+
+What I did:
+- Created the public audit page `/audit/[id]/page.tsx` that fetches the `publicId` from Supabase and strips private data.
+- Built a fallback UI for the public page in case Supabase is not configured yet.
+- Developed `src/app/api/summary/route.ts` to connect to OpenAI's API for the personalized 100-word summary, with a robust fallback.
+- Added dynamic Open Graph tags and an `opengraph-image.tsx` using `next/og` for beautiful Twitter/X shares.
+- Finalized the LLM prompts in `PROMPTS.md` and `src/lib/summaryPrompt.ts`.
+
+What I learned:
+- `next/og` makes programmatic social card generation incredibly fast. It is perfect for viral loops where every audit generates a unique image.
+
+Blockers / what I'm stuck on:
+- Vercel deployment and Resend email are the last remaining steps.
+
+Plan for tomorrow:
+- Complete all remaining markdown files (GTM, ECONOMICS, etc.).
+- Deploy on Vercel.
+- Verify Lighthouse scores and final testing.

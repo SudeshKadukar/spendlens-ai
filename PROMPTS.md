@@ -14,7 +14,8 @@ Do not invent numbers. Do not change audit math.
 ```
 
 ## Rationale
-The prompt is designed to be concise and data-driven, ensuring that the AI summary remains grounded in the deterministic audit results.
+The prompt is designed to be concise and data-driven, ensuring that the AI summary remains grounded in the deterministic audit results. By passing exactly what savings are and what the biggest reason is (calculated programmatically), we prevent the LLM from hallucinating incorrect math.
 
 ## Failures and Iterations
-[TBD]
+- Initial prompt allowed the AI to look at the raw tools list, but it often recalculated the savings incorrectly.
+- We changed the logic to run the deterministic engine first, and only pass the finalized mathematical values to the LLM.
