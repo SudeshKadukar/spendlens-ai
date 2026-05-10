@@ -59,3 +59,25 @@ Blockers / what I'm stuck on:
 Plan for tomorrow:
 - Build the `AuditResults` component to display total savings and individual recommendations.
 - Integrate the audit engine into `SpendForm.tsx` to handle the submit action.
+
+## Day 4 — 2026-05-10
+
+Hours worked: 2
+
+What I did:
+- Built the `AuditResults` component to display total monthly savings and annual savings.
+- Implemented logic to map over the engine's recommendations and display them with distinct visual badges.
+- Conditionally rendered a "Credex CTA" for savings > $500/month, and an honest "Perfect Score" or "Doing great" message for minimal savings.
+- Updated `SpendForm.tsx` to actually execute `runAudit()` on submit and conditionally render the `AuditResults`.
+- Added a reset button to allow users to audit another stack.
+
+What I learned:
+- Using dynamic styling based on action types (Keep, Downgrade, Consolidate) creates a very clear, scannable UI.
+
+Blockers / what I'm stuck on:
+- We don't have database persistence yet, so results are ephemeral. We need Supabase.
+
+Plan for tomorrow:
+- Set up Supabase and `audits` / `leads` tables.
+- Add an API route to save audit results.
+- Create lead capture form.
