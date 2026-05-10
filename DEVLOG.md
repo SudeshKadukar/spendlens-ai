@@ -81,3 +81,28 @@ Plan for tomorrow:
 - Set up Supabase and `audits` / `leads` tables.
 - Add an API route to save audit results.
 - Create lead capture form.
+
+## Day 5 — 2026-05-10
+
+Hours worked: 2.5
+
+What I did:
+- Installed `@supabase/supabase-js`.
+- Created `src/lib/supabase.ts` for database connections.
+- Designed `schema.sql` to track the schemas for `audits` and `leads` along with Row Level Security policies.
+- Built `POST /api/audit` to run the engine server-side, save to Supabase, and return a unique `publicId`.
+- Built `POST /api/lead` with an IP-based rate limiter and honeypot field for basic spam protection.
+- Created `LeadCapture.tsx` and integrated it into `AuditResults.tsx`.
+- Updated `SpendForm.tsx` to call the `/api/audit` route.
+
+What I learned:
+- Building a simple memory-based rate limiter map in a Next.js App Router API route.
+- Integrating invisible honeypots (`tabIndex={-1}`) to filter bots without annoying users with CAPTCHAs.
+
+Blockers / what I'm stuck on:
+- Lead capture API works but doesn't send the Resend email yet.
+
+Plan for tomorrow:
+- Create the public shareable audit URL (`/audit/[id]`).
+- Implement the Anthropic/OpenAI summary generation using `api/summary` or directly in the audit API.
+- Set up Open Graph tags for shareability.

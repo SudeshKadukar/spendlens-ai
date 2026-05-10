@@ -23,6 +23,8 @@ export default function SpendForm() {
   const [useCase, setUseCase] = useState<UseCase>('Coding');
   const [tools, setTools] = useState<ToolInput[]>([]);
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
+  const [publicId, setPublicId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const savedData = localStorage.getItem('spendLensData');
@@ -66,20 +68,41 @@ export default function SpendForm() {
     setTools(tools.map(t => t.id === id ? { ...t, [field]: value } : t));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = runAudit({ teamSize, useCase, tools });
-    setAuditResult(result);
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ teamSize, useCase, tools })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAuditResult(data.result);
+        setPublicId(data.publicId);
+      } else {
+        alert('Failed to generate audit. Please try again.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
     setAuditResult(null);
+    setPublicId(null);
   };
 
   if (!isLoaded) return <div className="text-center p-8">Loading your saved tools...</div>;
 
-  if (auditResult) {
-    return <AuditResults result={auditResult} onReset={handleReset} />;
+  if (auditResult && publicId) {
+    return <AuditResults result={auditResult} publicId={publicId} onReset={handleReset} teamSize={teamSize} />;
   }
 
   return (

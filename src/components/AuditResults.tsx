@@ -1,11 +1,14 @@
 import { AuditResult } from '../lib/types';
+import LeadCapture from './LeadCapture';
 
 interface AuditResultsProps {
   result: AuditResult;
+  publicId: string;
+  teamSize?: number;
   onReset: () => void;
 }
 
-export default function AuditResults({ result, onReset }: AuditResultsProps) {
+export default function AuditResults({ result, publicId, teamSize, onReset }: AuditResultsProps) {
   const isHighSavings = result.totalMonthlySavings > 500;
   const isLowSavings = result.totalMonthlySavings < 100;
 
@@ -89,6 +92,13 @@ export default function AuditResults({ result, onReset }: AuditResultsProps) {
           </p>
         </div>
       )}
+
+      <LeadCapture 
+        publicId={publicId} 
+        monthlySavings={result.totalMonthlySavings} 
+        isHighSavings={isHighSavings} 
+        teamSize={teamSize} 
+      />
 
       <div className="flex justify-center mt-8 pt-6 border-t border-slate-800">
         <button 
