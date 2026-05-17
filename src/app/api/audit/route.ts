@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { runAudit } from '@/lib/auditEngine';
+import { runAudit } from '@/lib/audit-engine';
 import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,8 +12,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Map tools from UI naming (name) to audit-engine naming (tool)
+    const mappedTools = tools.map((t: any) => ({
+      tool: t.name,
+      plan: t.plan,
+      seats: Number(t.seats) || 1,
+      monthlySpend: Number(t.monthlySpend) || 0
+    }));
+
     // Run the audit engine
-    const result = runAudit({ teamSize, useCase, tools });
+    const result = runAudit({
+      teamSize: Number(teamSize) || 1,
+      useCase: useCase.toLowerCase(),
+      tools: mappedTools
+    });
+    
     const publicId = uuidv4().replace(/-/g, '').substring(0, 10);
 
     // Save to Supabase (Mocked if no credentials)
@@ -23,11 +36,11 @@ export async function POST(request: Request) {
         team_size: teamSize,
         use_case: useCase,
         tools: JSON.stringify(tools),
-        recommendations: JSON.stringify(result.recommendations),
+        recommendations: JSON.stringify(result.results),
         total_monthly_spend: result.totalMonthlySpend,
         total_monthly_savings: result.totalMonthlySavings,
         total_annual_savings: result.totalAnnualSavings,
-        summary: result.summary
+        summary: null
       });
 
       if (error) {

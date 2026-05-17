@@ -43,7 +43,7 @@ export default function LeadCapture({ publicId, monthlySavings, isHighSavings, t
         const data = await response.json();
         alert(data.error || 'Failed to submit. Please try again.');
       }
-    } catch (error) {
+    } catch {
       alert('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -54,7 +54,7 @@ export default function LeadCapture({ publicId, monthlySavings, isHighSavings, t
     return (
       <div className="bg-emerald-900/30 border border-emerald-800/50 p-6 rounded-xl text-center">
         <h4 className="text-xl font-bold text-emerald-400 mb-2">Check your inbox!</h4>
-        <p className="text-slate-300">We've sent a confirmation email with a link to your full audit report.</p>
+        <p className="text-slate-300">We&apos;ve sent a confirmation email with a link to your full audit report.</p>
       </div>
     );
   }
@@ -62,7 +62,7 @@ export default function LeadCapture({ publicId, monthlySavings, isHighSavings, t
   return (
     <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 mt-8 max-w-xl mx-auto">
       <h3 className="text-lg font-bold text-white mb-2 text-center">Save this report & get optimization tips</h3>
-      <p className="text-slate-400 text-sm text-center mb-6">We'll send you a secure link to this audit so you can share it with your team.</p>
+      <p className="text-slate-400 text-sm text-center mb-6">We&apos;ll send you a secure link to this audit so you can share it with your team.</p>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Honeypot field - invisible to users */}

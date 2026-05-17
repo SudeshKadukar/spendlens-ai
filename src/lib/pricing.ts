@@ -32,10 +32,22 @@ export const TOOL_PRICING: Record<ToolName, Partial<Record<PlanName, number>>> =
     'Team': 40
   },
   'Anthropic API': {
-    // API spend is dynamic, so we just set 0 here. 
-    // Handled differently in audit engine.
+    // API spend is dynamic.
   },
   'OpenAI API': {
     // API spend is dynamic.
+  },
+  'Anthropic API direct': {
+    // API spend is dynamic.
+  },
+  'OpenAI API direct': {
+    // API spend is dynamic.
+  },
+  'v0': {
+    'Free': 0,
+    'Premium': 20,
+    'Team': 30,
+    'Business': 50,
+    'Enterprise': 100
   }
 };

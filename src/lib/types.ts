@@ -5,8 +5,11 @@ export type ToolName =
   | 'ChatGPT' 
   | 'Anthropic API' 
   | 'OpenAI API' 
+  | 'Anthropic API direct' 
+  | 'OpenAI API direct' 
   | 'Gemini' 
-  | 'Windsurf';
+  | 'Windsurf'
+  | 'v0';
 
 export type PlanName = 
   | 'Free'
@@ -16,7 +19,11 @@ export type PlanName =
   | 'Enterprise'
   | 'Team'
   | 'Max'
-  | 'Individual';
+  | 'Individual'
+  | 'Plus'
+  | 'Ultra'
+  | 'API direct'
+  | 'API';
 
 export type UseCase = 'Coding' | 'Writing' | 'Data' | 'Research' | 'Mixed';
 

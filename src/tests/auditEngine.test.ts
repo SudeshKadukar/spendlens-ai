@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { runAudit } from '../lib/auditEngine';
-import { AuditInput, ToolInput } from '../lib/types';
+import { AuditInput } from '../lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('Audit Engine', () => {

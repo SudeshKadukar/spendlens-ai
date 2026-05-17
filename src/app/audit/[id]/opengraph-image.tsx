@@ -11,7 +11,7 @@ export const size = {
 
 export const contentType = 'image/png';
 
-export default async function Image({ params }: { params: { id: string } }) {
+export default async function Image() {
   // We can fetch data from Supabase here to make it dynamic
   // For this assignment, we'll keep it static but beautifully designed
 

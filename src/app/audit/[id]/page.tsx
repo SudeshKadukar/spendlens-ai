@@ -4,16 +4,14 @@ import AuditResults from '@/components/AuditResults';
 import { AuditResult } from '@/lib/types';
 import Link from 'next/link';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const publicId = params.id;
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
 
-  // We could fetch the audit from Supabase here to customize the title/description
-  // For now, we'll keep it generic but optimized for social sharing.
   return {
     title: `AI Spend Audit Result | SpendLens`,
     description: `I just audited my AI stack and found potential savings. Audit yours for free.`,
     openGraph: {
-      title: 'My AI Spend Audit Result',
+      title: `AI Audit Result #${id.substring(0, 8)}`,
       description: 'Check out these potential savings on Cursor, Claude, OpenAI, and more.',
       type: 'website',
     },
@@ -25,8 +23,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function PublicAuditPage({ params }: { params: { id: string } }) {
-  const publicId = params.id;
+export default async function PublicAuditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const publicId = id;
 
   let auditData = null;
   
@@ -43,7 +42,7 @@ export default async function PublicAuditPage({ params }: { params: { id: string
   }
 
   // Fallback for demo when Supabase isn't connected
-  const mockResult: AuditResult = auditData ? {
+  const mockResult: AuditResult | null = auditData ? {
     id: auditData.id,
     totalMonthlySpend: Number(auditData.total_monthly_spend),
     totalMonthlySavings: Number(auditData.total_monthly_savings),
@@ -52,7 +51,7 @@ export default async function PublicAuditPage({ params }: { params: { id: string
       ? JSON.parse(auditData.recommendations) 
       : auditData.recommendations,
     summary: auditData.summary
-  } : null as any; // We'll handle the null case below
+  } : null;
 
   return (
     <main className="flex-grow flex flex-col items-center p-8 md:p-24 bg-slate-950 min-h-screen">
@@ -63,10 +62,10 @@ export default async function PublicAuditPage({ params }: { params: { id: string
         </Link>
       </div>
 
-      {!auditData && !process.env.NEXT_PUBLIC_SUPABASE_URL ? (
+      {!auditData || !mockResult ? (
         <div className="bg-slate-900 border border-slate-800 p-12 text-center rounded-xl w-full max-w-4xl">
           <h2 className="text-2xl font-bold text-white mb-4">Audit Not Found</h2>
-          <p className="text-slate-400 mb-8">We couldn't find an audit with this ID, or the database isn't connected.</p>
+          <p className="text-slate-400 mb-8">We couldn&apos;t find an audit with this ID, or the database isn&apos;t connected.</p>
           <Link href="/" className="text-blue-400 hover:text-blue-300 underline">Go back home</Link>
         </div>
       ) : (

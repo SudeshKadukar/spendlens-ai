@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuditInput, AuditResult, Recommendation, ToolInput, ToolName } from './types';
 import { TOOL_PRICING } from './pricing';
 
-const isCodingTool = (name: ToolName) => ['Cursor', 'GitHub Copilot', 'Windsurf'].includes(name);
-const isApiTool = (name: ToolName) => ['OpenAI API', 'Anthropic API'].includes(name);
+const isCodingTool = (name: ToolName) => ['Cursor', 'GitHub Copilot', 'Windsurf', 'v0'].includes(name);
+const isApiTool = (name: ToolName) => ['OpenAI API', 'Anthropic API', 'OpenAI API direct', 'Anthropic API direct'].includes(name);
 
 export function runAudit(input: AuditInput): AuditResult {
   let totalMonthlySpend = 0;
@@ -108,9 +108,12 @@ export function runAudit(input: AuditInput): AuditResult {
   // 4. API spend recommendation
   if (apiSpend > 100) {
     const apiSavings = apiSpend * 0.15; // Assume 15% savings with credits
+    const hasAnthropic = input.tools.some(t => t.name.includes('Anthropic'));
+    const apiToolName: ToolName = hasAnthropic ? 'Anthropic API direct' : 'OpenAI API direct';
+    
     recommendations.push({
       toolId: uuidv4(),
-      toolName: 'OpenAI API', // generic 
+      toolName: apiToolName,
       action: 'Optimize API',
       message: `Your API spend is high ($${apiSpend}/mo). You could save ~15% by purchasing discounted compute credits.`,
       potentialMonthlySavings: apiSavings

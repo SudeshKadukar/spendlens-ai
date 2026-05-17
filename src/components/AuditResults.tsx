@@ -2,7 +2,7 @@ import { AuditResult } from '../lib/types';
 import LeadCapture from './LeadCapture';
 
 interface AuditResultsProps {
-  result: AuditResult;
+  result: any;
   publicId: string;
   teamSize?: number;
   onReset: () => void;
@@ -11,6 +11,8 @@ interface AuditResultsProps {
 export default function AuditResults({ result, publicId, teamSize, onReset }: AuditResultsProps) {
   const isHighSavings = result.totalMonthlySavings > 500;
   const isLowSavings = result.totalMonthlySavings < 100;
+
+  const recommendationsList = result.results || result.recommendations || [];
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-xl p-6 md:p-8 shadow-2xl animate-fade-in">
@@ -38,29 +40,42 @@ export default function AuditResults({ result, publicId, teamSize, onReset }: Au
 
       <div className="mb-10 space-y-4">
         <h3 className="text-xl font-semibold mb-4 text-white">Tool-by-Tool Recommendations</h3>
-        {result.recommendations.map((rec) => (
-          <div key={rec.toolId} className="bg-slate-800/50 p-5 rounded-lg border border-slate-700/50 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="font-bold text-lg text-white">{rec.toolName}</span>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  rec.action === 'Keep' ? 'bg-slate-700 text-slate-300' : 
-                  rec.action === 'Downgrade' ? 'bg-orange-900/50 text-orange-400 border border-orange-800/50' :
-                  rec.action === 'Consolidate' ? 'bg-purple-900/50 text-purple-400 border border-purple-800/50' :
-                  'bg-blue-900/50 text-blue-400 border border-blue-800/50'
-                }`}>
-                  {rec.action}
-                </span>
+        {recommendationsList.map((rec: any, index: number) => {
+          const toolName = rec.tool || rec.toolName;
+          const action = rec.recommendedAction || rec.action;
+          const message = rec.reason || rec.message;
+          const monthlySavings = rec.monthlySavings !== undefined ? rec.monthlySavings : rec.potentialMonthlySavings;
+          const toolId = rec.toolId || `${toolName}-${index}`;
+
+          const actionLower = action.toLowerCase();
+          const isKeep = actionLower.includes('keep');
+          const isDowngrade = actionLower.includes('downgrade') || actionLower.includes('consider');
+          const isReview = actionLower.includes('review');
+
+          return (
+            <div key={toolId} className="bg-slate-800/50 p-5 rounded-lg border border-slate-700/50 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="font-bold text-lg text-white">{toolName}</span>
+                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                    isKeep ? 'bg-slate-700 text-slate-300' : 
+                    isDowngrade ? 'bg-orange-900/50 text-orange-400 border border-orange-800/50' :
+                    isReview ? 'bg-purple-900/50 text-purple-400 border border-purple-800/50' :
+                    'bg-blue-900/50 text-blue-400 border border-blue-800/50'
+                  }`}>
+                    {action}
+                  </span>
+                </div>
+                <p className="text-slate-300 text-sm">{message}</p>
               </div>
-              <p className="text-slate-300 text-sm">{rec.message}</p>
+              {monthlySavings > 0 && (
+                <div className="text-right shrink-0">
+                  <span className="text-emerald-400 font-bold block">+${monthlySavings}/mo</span>
+                </div>
+              )}
             </div>
-            {rec.potentialMonthlySavings > 0 && (
-              <div className="text-right shrink-0">
-                <span className="text-emerald-400 font-bold block">+${rec.potentialMonthlySavings}/mo</span>
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {isHighSavings && (
@@ -77,7 +92,7 @@ export default function AuditResults({ result, publicId, teamSize, onReset }: Au
 
       {isLowSavings && result.totalMonthlySavings > 0 && (
         <div className="bg-slate-800 p-6 rounded-xl text-center mb-8 border border-slate-700">
-          <h4 className="text-lg font-semibold text-slate-200 mb-2">You're doing great!</h4>
+          <h4 className="text-lg font-semibold text-slate-200 mb-2">You&apos;re doing great!</h4>
           <p className="text-slate-400 text-sm">
             Your spending is relatively well-optimized. Implementing the small changes above can save you a bit, but there are no major red flags.
           </p>
