@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import SpendForm from '@/components/SpendForm';
 
 export default function Home() {
@@ -10,9 +11,15 @@ export default function Home() {
         <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto font-light">
           Audit your Cursor, Claude, ChatGPT, Copilot, and API spend in under 60 seconds.
         </p>
+        <Link
+          href="/audit"
+          className="inline-block mt-8 bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 px-8 rounded-lg shadow-lg shadow-blue-500/20 transition-all"
+        >
+          Audit my AI spend
+        </Link>
       </div>
       
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-4xl" id="audit-form">
         <SpendForm />
       </div>
       

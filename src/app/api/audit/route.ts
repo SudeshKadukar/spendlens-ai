@@ -1,37 +1,37 @@
-import { NextResponse } from 'next/server';
-import { runAudit } from '@/lib/audit-engine';
-import { supabase } from '@/lib/supabase';
-import { v4 as uuidv4 } from 'uuid';
+import { NextResponse } from "next/server";
+import { runAudit } from "@/lib/audit-engine";
+import type { UseCase } from "@/lib/pricing-data";
+import { generateSummary } from "@/lib/llm-summary";
+import { supabase } from "@/lib/supabase";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { teamSize, useCase, tools } = body;
 
-    if (!teamSize || !useCase || !tools) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!teamSize || !useCase || !tools?.length) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Map tools from UI naming (name) to audit-engine naming (tool)
-    const mappedTools = tools.map((t: any) => ({
+    const mappedTools = tools.map((t: { name: string; plan: string; seats: number; monthlySpend: number }) => ({
       tool: t.name,
       plan: t.plan,
       seats: Number(t.seats) || 1,
-      monthlySpend: Number(t.monthlySpend) || 0
+      monthlySpend: Number(t.monthlySpend) || 0,
     }));
 
-    // Run the audit engine
     const result = runAudit({
       teamSize: Number(teamSize) || 1,
-      useCase: useCase.toLowerCase(),
-      tools: mappedTools
+      useCase: String(useCase).toLowerCase() as UseCase,
+      tools: mappedTools,
     });
-    
-    const publicId = uuidv4().replace(/-/g, '').substring(0, 10);
 
-    // Save to Supabase (Mocked if no credentials)
+    const summary = await generateSummary(result);
+    const publicId = uuidv4().replace(/-/g, "").substring(0, 10);
+
     if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      const { error } = await supabase.from('audits').insert({
+      const { error } = await supabase.from("audits").insert({
         public_id: publicId,
         team_size: teamSize,
         use_case: useCase,
@@ -40,21 +40,20 @@ export async function POST(request: Request) {
         total_monthly_spend: result.totalMonthlySpend,
         total_monthly_savings: result.totalMonthlySavings,
         total_annual_savings: result.totalAnnualSavings,
-        summary: null
+        summary,
       });
 
       if (error) {
-        console.error('Error saving audit to Supabase:', error);
-        // We still return the result even if db fails for resilience
+        console.error("Error saving audit to Supabase:", error);
       }
     }
 
     return NextResponse.json({
-      result,
-      publicId
+      result: { ...result, summary },
+      publicId,
     });
   } catch (error) {
-    console.error('Audit API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Audit API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

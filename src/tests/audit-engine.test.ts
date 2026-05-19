@@ -105,6 +105,53 @@ describe("Rule-based AI Spend Audit Engine", () => {
     expect(result.results[0].recommendedAction).toBe("Downgrade to Gemini Pro");
   });
 
+  it("shows high-savings status when savings exceed $500/month", () => {
+    const result = runAudit({
+      teamSize: 2,
+      useCase: "coding",
+      tools: [
+        {
+          tool: "Gemini",
+          plan: "Ultra",
+          seats: 2,
+          monthlySpend: 600,
+        },
+      ],
+    });
+
+    expect(result.totalMonthlySavings).toBeGreaterThan(500);
+    expect(result.isHighSavings).toBe(true);
+    expect(result.isAlreadyOptimized).toBe(false);
+  });
+
+  it("handles multiple tools correctly", () => {
+    const result = runAudit({
+      teamSize: 1,
+      useCase: "coding",
+      tools: [
+        { tool: "ChatGPT", plan: "Plus", seats: 1, monthlySpend: 20 },
+        { tool: "ChatGPT", plan: "Team", seats: 1, monthlySpend: 30 },
+      ],
+    });
+
+    expect(result.totalMonthlySpend).toBe(50);
+    expect(result.results).toHaveLength(2);
+    expect(result.totalMonthlySavings).toBe(10);
+  });
+
+  it("does not create fake savings for already optimized users", () => {
+    const result = runAudit({
+      teamSize: 1,
+      useCase: "coding",
+      tools: [
+        { tool: "Cursor", plan: "Pro", seats: 1, monthlySpend: 20 },
+      ],
+    });
+
+    expect(result.totalMonthlySavings).toBe(0);
+    expect(result.isAlreadyOptimized).toBe(true);
+  });
+
   it("Rule 5: v0 Team/Business overkill for solo users", () => {
     const result = runAudit({
       teamSize: 1,

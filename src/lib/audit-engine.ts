@@ -1,4 +1,8 @@
 import { PRICING_DATA, ToolName, UseCase } from "./pricing-data";
+import {
+  HIGH_SAVINGS_THRESHOLD,
+  ALREADY_OPTIMIZED_THRESHOLD,
+} from "./rules";
 
 export type ToolInput = {
   tool: ToolName;
@@ -166,8 +170,8 @@ export function runAudit(input: AuditInput): AuditResult {
     totalMonthlySpend,
     totalMonthlySavings,
     totalAnnualSavings,
-    isHighSavings: totalMonthlySavings > 500,
-    isAlreadyOptimized: totalMonthlySavings < 100,
+    isHighSavings: totalMonthlySavings > HIGH_SAVINGS_THRESHOLD,
+    isAlreadyOptimized: totalMonthlySavings < ALREADY_OPTIMIZED_THRESHOLD,
     results,
   };
 }
